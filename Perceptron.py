@@ -17,14 +17,15 @@ class Perceptron():
 		for inp in inputs:
 			self.data.append(inp)
 			self.weight.append(0)
+		self.calcPhi()
 
 	def calcPhi(self):
-		result = 0
+		jumlah = 0
 		for i in range(len(self.data)):
-			result += self.data[i] * self.weight[i]
-		self.sum = result
-		self.output = sigmoid(result)
+			jumlah += self.data[i] * self.weight[i]
+		self.output = sigmoid(jumlah)
 
+	#for backprop
 	def delta(self, multiplier):
 		self.delta = self.output * (1-self.output) * multiplier
 
