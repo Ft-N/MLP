@@ -16,7 +16,10 @@ class Perceptron():
 		self.rate = rate
 		for inp in inputs:
 			self.data.append(inp)
-			self.weight.append(0)
+			# self.weight.append(0)
+
+	def setWeight(self, weight):
+		self.weight.append(weight)
 
 	def calcPhi(self):
 		result = 0
