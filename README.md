@@ -1,1 +1,1 @@
-# Multilevel Perceptron
+# Multilayer Perceptron
