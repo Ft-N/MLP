@@ -57,12 +57,11 @@ class MultilayerPerceptron:
 				for layer_idx in range(self.layers):
 					for perceptron in self.layers[layer_idx]:
 						perceptron.update_weight()
-
 	
 	def initialize_perceptrons_in_layer (self, number_of_perceptrons, number_of_inputs):
 		layer = []
 		for idx_perceptron in range(number_of_perceptrons):
-			layer.append(Perceptron(self.learning_rate, number_of_inputs))
+			layer.append(Perceptron(self.learning_rate, number_of_inputs+1))
 		return layer
 
 	def feed_forward(self, row):
@@ -72,6 +71,7 @@ class MultilayerPerceptron:
 		# Initial inputs
 		for column in self.data_inputs.columns:
    	 		inputs.append(self.data_inputs[column][row])
+   	 	inputs.append(1)
 
 		for layer_idx in range(self.layers):
 			outputs.clear()
@@ -83,6 +83,7 @@ class MultilayerPerceptron:
 			inputs.clear()
 			for output_data in outputs:
 				inputs.append(output_data)
+			inputs.append(1)
 
 	def backward_prop(self, row):
 		# Last layer
