@@ -25,7 +25,7 @@ class Perceptron:
 
 	def input_data(self, data):
 		self.data = []
-		for datum in new_data:
+		for datum in data:
 			self.data.append(datum)
 
 	def calc_sigmoid(self):
