@@ -18,9 +18,8 @@ class Perceptron:
 			# TO DO: RANDOMIZE
 			self.weight.append(0)
 			self.delta_weight.append(0)
-		self.calc_sigmoid()
 
-	def input_data (self, data):
+	def input_data(self, data):
 		self.data = []
 		for datum in new_data:
 			self.data.append(datum)
@@ -43,3 +42,4 @@ class Perceptron:
 	def update_weight(self):
 		for i in range(len(self.weight)):
 			self.weight[i] += self.delta_weight[i]
+			self.delta_weight[i] = 0
