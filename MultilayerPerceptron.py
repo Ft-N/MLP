@@ -1,4 +1,6 @@
 import pandas as pd
+from Perceptron import *
+
 class MultilayerPerceptron:
 
 	def __init__(self, hidden_layers=[3], learning_rate=0.01, max_iter=100, error_treshold=0.01, batch_size=32):
@@ -10,69 +12,68 @@ class MultilayerPerceptron:
 		self.error_treshold = error_treshold
 		self.batch_size = 32
 
+		# Initialize perceptrons in the hidden layers (from index 1)
+		for layer_idx in range(1, len(self.hidden_layers)):
+			# hidden_layer = Array of perceptrons
+			number_of_perceptrons_current_layer = self.hidden_layers[layer_idx]
+			number_of_perceptrons_previous_layer = self.hidden_layers[layer_idx - 1]
+			hidden_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_current_layer, number_of_perceptrons_previous_layer)
+			self.layers.append(hidden_layer)
+
 	def fit(self, data_inputs, target):
 		self.data_inputs = data_inputs
 		self.target = target
 
-		# Get how many columns (attributes) in data_inputs:
-		input_nums = len(self.data_inputs.columns)
-		data_input_nums = len(data_inputs)
+		# Construct first hidden layer of perceptrons
+		number_of_perceptrons_first_hidden_layer = self.hidden_layers[0]
+		number_of_inputs = len(self.data_inputs.columns)
 
-		iteration = 1
-		while (iteration < self.max_iter):
-			self.initial_feed_forward(row)
-			self.backward_prop(row)
+		first_hidden_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_first_hidden_layer, number_of_inputs)
+		self.layers.append(0, first_hidden_layer)
 
-			for row in range(1, data_input_nums):
+		# Construct last (output) layer of perceptrons
+		number_of_perceptrons_last_layer = len(self.target.unique())
+		last_hidden_layer_idx = len(self.hidden_layers) - 1
+		number_of_perceptrons_previous_layer = self.hidden_layers[last_hidden_layer_idx]
+
+		last_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_perceptrons_previous_layer)
+		self.layers.append(last_layer)
+
+		# Start feed forward and backward prop
+		number_of_rows = len(data_inputs)
+		for iteration in range(self.max_iter):
+			for row in range(number_of_rows):
+				self.feed_forward(row)
 				self.backward_prop(row)
 
-			iteration = iteration + 1
+			if (row % self.batch_size == 0):
+				# Update all weights
+				for layer_idx in range(self.layers):
+					for perceptron in self.layers[layer_idx]:
+						perceptron.update_weight()
+
 	
-	def initial_feed_forward(self, row):
-		# First layer
-		initial_inputs = []
-		for column in self.data_inputs.keys():
-			initial_input_data = self.data_inputs[column][row]
-			initial_inputs.append(initial_input_data)
+	def initialize_perceptrons_in_layer (self, number_of_perceptrons, number_of_inputs):
+		layer = []
+		for idx_perceptron in range(number_of_perceptrons):
+			layer.append(Perceptron(self.learning_rate, number_of_inputs))
+		return layer
 
-		perceptron = Perceptron(initial_inputs, self.learning_rate)
-		first_hidden_layer = []
+	def feed_forward(self, row):
 		inputs = []
+		# Initial inputs
+		for column in self.data_inputs.columns:
+   	 		inputs.append(self.data_inputs[column][row])
 
-		# Hidden layer
-		for layer in range(self.hidden_layers[0]):
-			first_hidden_layer.append(perceptron)
-			inputs.append(perceptron.output)
-			# First hidden layer
-			self.layers.append(copy(first_hidden_layer))
-			# Second until last hidden_layer
-			self.append_perceptrons_from_second_hidden_layer(inputs)
-
-		# Output layer
-		output_layer = []
-
-		# Count how many unique value in the target:
-		perceptrons_in_output_layer = len(self.target.unique())
-		for perceptron_output_layer in range(perceptrons_in_output_layer):
-			perceptron = Perceptron(inputs, self.learning_rate)
-			output_layer.append(perceptron)
-		self.layers.append(copy(output_layer))
-
-	def append_perceptrons_from_second_hidden_layer(self, inputs):
-		for layer in range(1, self.hidden_layers):
-			hidden_layer = []
-			temp = []
-
-			for perceptron_in_hidden_layer in range(self.hidden_layers[layer]):
-				perceptron = Perceptron(inputs, self.learning_rate)
-				hidden_layer.append(perceptron)
-				temp.append(perceptron.output)
-			self.layers.append(copy(hidden_layer))
+		for layer_idx in range(self.layers):
+			outputs = []
+			for perceptron in self.layers[layer_idx]:
+				perceptron.input_data(inputs)
+				outputs.append(perceptron.output)
 
 			inputs = []
-			for output_data in temp:
+			for output_data in outputs:
 				inputs.append(output_data)
-
 
 	def backward_prop(self, row):
 		# Last layer
@@ -101,7 +102,6 @@ data = pd.read_csv("iris.csv")
 # for input_index in range(len(data.columns)):
 # 	print(data[0])
 
-# perceptron = MultilayerPerceptron(data)
-
+# perceptron = MultilayerPerceptron()
 # initial_input.append(self.data_inputs[0][input_index])
 # print(data)
