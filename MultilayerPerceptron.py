@@ -67,17 +67,20 @@ class MultilayerPerceptron:
 
 	def feed_forward(self, row):
 		inputs = []
+		outputs = []
+
 		# Initial inputs
 		for column in self.data_inputs.columns:
    	 		inputs.append(self.data_inputs[column][row])
 
 		for layer_idx in range(self.layers):
-			outputs = []
+			outputs.clear()
 			for perceptron in self.layers[layer_idx]:
 				perceptron.input_data(inputs)
+				perceptron.calc_sigmoid()
 				outputs.append(perceptron.output)
 
-			inputs = []
+			inputs.clear()
 			for output_data in outputs:
 				inputs.append(output_data)
 
@@ -85,18 +88,17 @@ class MultilayerPerceptron:
 		# Last layer
 		for perceptron in self.layers[-1]:
 			# Calculate error (multiplier):
-			error = perceptron.output - self.target[row]
-			perceptron.calc_delta(error)
+			perceptron.calc_delta(perceptron.output - self.target[row])
 			perceptron.update_delta_weight()
 
 		# Hidden layers
-		for layer in range(len(self.le)):
-			for index in range(self.layers[layer]):
+		for layer_idx in range(len(self.layers)-1):
+			for perc_idx in range(self.layers[-layer_idx-2]):
 				error = 0
-				for next_perceptron in self.layers[layer + 1]:
-					error += next_perceptron.delta * next_perceptron.weight[index]
-				self.layers[layer][index].calc_delta(error)
-				self.layers[layer][index].update_delta_weight()
+				for next_perceptron in self.layers[-layer_idx-1]:
+					error += next_perceptron.delta * next_perceptron.weight[perc_idx]
+				self.layers[layer_idx][perc_idx].calc_delta(error)
+				self.layers[layer_idx][perc_idx].update_delta_weight()
 
 
 data = pd.read_csv("iris.csv")

@@ -5,11 +5,6 @@ def sigmoid(x):
 
 class Perceptron:
 
-	#self.rate
-	#self.sum
-	#self.output
-	#self.delta
-
 	def __init__(self, rate, input_length):
 		self.data = []
 		self.weight = []
