@@ -7,7 +7,7 @@ from sklearn import metrics
 
 class MultilayerPerceptron:
 
-	def __init__(self, hidden_layer_sizes=[3, 4, 5], learning_rate=0.01, max_iter=2000, error_treshold=0.01, batch_size=32):
+	def __init__(self, hidden_layer_sizes=[2, 3], learning_rate=0.001, max_iter=200, error_treshold=0.0001, batch_size=32):
 		# Attributes
 		self.layers = []
 		self.hidden_layer_sizes = hidden_layer_sizes
@@ -159,6 +159,13 @@ class MultilayerPerceptron:
 			predictions.append(self.classes[idx])
 		return predictions
 
+	def show_model(self):
+		for layer_idx in range(len(self.layers)):
+			for perceptron_idx in range(len(self.layers[layer_idx])):
+				for weight_idx in range(len(self.layers[layer_idx][perceptron_idx].weight)):
+					print("Weight ", weight_idx, "-", "[", layer_idx, "][", perceptron_idx, "]: ", self.layers[layer_idx][perceptron_idx].weight[weight_idx])
+				
+
 
 data = pd.read_csv("iris.csv")
 for i in range(10):
@@ -187,3 +194,7 @@ for i in range(10):
 	print("Tested : " + str(len(prediction)))
 	print("True : " + str(val))
 	print("Accuracy : " + str(val/len(prediction)))
+
+	print("Model (weights):")
+
+	mlp.show_model()

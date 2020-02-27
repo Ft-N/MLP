@@ -24,7 +24,9 @@ trainY.head(5)
 testX.head(5)
 testY.head(5)
 
-clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(3, 3), random_state=1)
+# print(testX)
+# print(testY)
+clf = MLPClassifier(solver='sgd', batch_size=32, alpha=0, momentum=0, nesterovs_momentum=False, activation='logistic')
 clf.fit(trainX, trainY)
 
 prediction = clf.predict(testX)
