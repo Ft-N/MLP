@@ -1,4 +1,3 @@
-import sklearn
 import pandas as pd
 import numpy as np
 from sklearn.neural_network import MLPClassifier # neural network
@@ -26,12 +25,27 @@ testY.head(5)
 
 # print(testX)
 # print(testY)
-clf = MLPClassifier(solver='sgd', batch_size=32, alpha=0, momentum=0, nesterovs_momentum=False, activation='logistic')
-clf.fit(trainX, trainY)
 
-prediction = clf.predict(testX)
+# print(newData)
+# print(target)
+# print(trainX)
+# print(trainY)
+clf1 = MLPClassifier(solver='sgd', batch_size=32, alpha=0, momentum=0, nesterovs_momentum=False, activation='logistic', max_iter=4001, hidden_layer_sizes=(100))
+
+clf1.fit(newData,target)
+
+print("Model (weights)")
+print(clf1.coefs_)
+
+
+clf2 = MLPClassifier(solver='sgd', batch_size=32, alpha=0, momentum=0, nesterovs_momentum=False, activation='logistic', max_iter=4001, hidden_layer_sizes=(100))
+clf2.fit(trainX, trainY)
+
+prediction = clf2.predict(testX)
+print("Prediction")
 print(prediction)
 
+print("Values of testY")
 print(testY.values)
 
 print('The accuracy of the Multi-layer Perceptron is:',metrics.accuracy_score(prediction,testY))

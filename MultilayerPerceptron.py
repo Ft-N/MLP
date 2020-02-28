@@ -1,11 +1,58 @@
 import pandas as pd
-from Perceptron import *
 import numpy as np
+import math
 from sklearn.neural_network import MLPClassifier # neural network
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 
-class MultilayerPerceptron:
+def sigmoid(x):
+	return 1 / (1 + math.exp(-x))
+
+class Perceptron:
+
+	def __init__(self, rate, input_length):
+		self.data = []
+		self.weight = []
+		self.delta_weight = []
+		self.rate = rate
+
+		random_matrix = np.random.randn(1, input_length) * np.sqrt(1 / input_length)
+		for rand_array in random_matrix:
+			for rand_num in rand_array:
+				self.weight.append(rand_num)
+		
+		# print(self.weight)
+
+		for inp in range(input_length):
+			self.delta_weight.append(0)
+			
+
+	def input_data(self, data):
+		self.data = []
+		for datum in data:
+			self.data.append(datum)
+
+	def calc_sigmoid(self):
+		jumlah = 0
+		for i in range(len(self.data)):
+			jumlah += self.data[i] * self.weight[i]
+		self.output = sigmoid(jumlah)
+
+	#for backprop
+	def calc_delta(self, multiplier):
+		self.delta = self.output * (1-self.output) * multiplier
+
+	def update_delta_weight(self):
+		for i in range(len(self.delta_weight)):
+			self.delta_weight[i] += self.rate * self.delta * self.data[i]
+	
+	# End of batch-size
+	def update_weight(self):
+		for i in range(len(self.weight)):
+			self.weight[i] += self.delta_weight[i]
+			self.delta_weight[i] = 0
+
+class myMLP:
 
 	def __init__(self, hidden_layer_sizes=[2, 3], learning_rate=0.001, max_iter=200, error_treshold=0.0001, batch_size=32):
 		# Attributes
@@ -29,8 +76,8 @@ class MultilayerPerceptron:
 			for layer_idx in range(len(self.hidden_layer_sizes)):
 				# hidden_layer = Array of perceptrons
 				number_of_perceptrons_current_layer = self.hidden_layer_sizes[layer_idx]
-				number_of_inputs_from_previous_layer = self.hidden_layer_sizes[layer_idx - 1]
 				hidden_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_current_layer, number_of_inputs_from_previous_layer)
+				number_of_inputs_from_previous_layer = self.hidden_layer_sizes[layer_idx]
 				self.layers.append(hidden_layer)
 
 			# Construct last (output) layer of perceptrons
@@ -53,6 +100,8 @@ class MultilayerPerceptron:
 		for iteration in range(self.max_iter):
 			error_total = 0
 			for row in range(number_of_rows):
+				# print("row")
+				# print(row)
 				self.feed_forward(row)
 
 				# Do backward prop then get error
@@ -123,6 +172,7 @@ class MultilayerPerceptron:
 			for perc_idx in range(layer_size): #untuk setiap perceptron di layer itu
 				diff = 0
 				for next_perceptron in self.layers[-layer_idx-1]:
+
 					diff += next_perceptron.delta * next_perceptron.weight[perc_idx]
 				self.layers[-layer_idx-2][perc_idx].calc_delta(diff)
 				self.layers[-layer_idx-2][perc_idx].update_delta_weight()
@@ -164,33 +214,41 @@ class MultilayerPerceptron:
 
 
 data = pd.read_csv("iris.csv")
-for i in range(10):
-	mlp = MultilayerPerceptron()
-	inputs = data.drop('species', axis = 1)
-	target = data[['species']]
-	df = pd.concat([inputs, target], axis=1)
-	train, test = train_test_split(df, test_size=0.3)
 
-	trainX = train[['sepal_length','sepal_width','petal_length','petal_width']] # taking the training data features
-	trainY = train.species # output of our training data
-	testX = test[['sepal_length','sepal_width','petal_length','petal_width']] # taking test data features
-	testY = test.species   # output value of test data
+mlp = myMLP(max_iter = 4001, hidden_layer_sizes=[100])
+inputs = data.drop('species', axis = 1)
+target = data[['species']]
 
-	trainX = trainX.reset_index(drop=True)
-	trainY = trainY.reset_index(drop=True)
-	testX = testX.reset_index(drop=True)
-	testY = testY.reset_index(drop=True)
+mlp.fit(inputs,target)
 
-	mlp.fit(trainX, trainY)
-	prediction = mlp.predict(testX)
-	val = 0
-	for i in range(len(prediction)):
-		if prediction[i] == testY.values[i]:
-			val += 1
-	print("Tested : " + str(len(prediction)))
-	print("True : " + str(val))
-	print("Accuracy : " + str(val/len(prediction)))
+print("Model (weights):")
+mlp.show_model()
 
-	print("Model (weights):")
+#training
+df = pd.concat([inputs, target], axis=1)
+train, test = train_test_split(df, test_size=0.3)
 
-	mlp.show_model()
+trainX = train[['sepal_length','sepal_width','petal_length','petal_width']] # taking the training data features
+trainY = train.species # output of our training data
+testX = test[['sepal_length','sepal_width','petal_length','petal_width']] # taking test data features
+testY = test.species   # output value of test data
+
+trainX = trainX.reset_index(drop=True)
+trainY = trainY.reset_index(drop=True)
+testX = testX.reset_index(drop=True)
+testY = testY.reset_index(drop=True)
+
+mlp2 = myMLP(max_iter = 4001, hidden_layer_sizes=[100])
+mlp2.fit(trainX, trainY)
+prediction = mlp2.predict(testX)
+val = 0
+for i in range(len(prediction)):
+	if prediction[i] == testY.values[i]:
+		val += 1
+print("Tested : " + str(len(prediction)))
+print("True : " + str(val))
+print("Accuracy : " + str(val/len(prediction)))
+
+# print("Model (weights):")
+
+# mlp.show_model()
