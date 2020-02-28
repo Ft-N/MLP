@@ -23,33 +23,29 @@ class MultilayerPerceptron:
 		self.classes = self.target.unique()
 
 		try:
-			# Construct first hidden layer of perceptrons
-			number_of_perceptrons_first_hidden_layer = self.hidden_layer_sizes[0]
-			number_of_inputs = len(self.data_inputs.columns)
-			first_hidden_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_first_hidden_layer, number_of_inputs)
-			self.layers.append(first_hidden_layer)
-
+			#
+			number_of_inputs_from_previous_layer = len(self.data_inputs.columns)
 			# Initialize perceptrons in the hidden layers (from index 1)
-			for layer_idx in range(1, len(self.hidden_layer_sizes)):
+			for layer_idx in range(len(self.hidden_layer_sizes)):
 				# hidden_layer = Array of perceptrons
 				number_of_perceptrons_current_layer = self.hidden_layer_sizes[layer_idx]
-				number_of_perceptrons_previous_layer = self.hidden_layer_sizes[layer_idx - 1]
-				hidden_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_current_layer, number_of_perceptrons_previous_layer)
+				number_of_inputs_from_previous_layer = self.hidden_layer_sizes[layer_idx - 1]
+				hidden_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_current_layer, number_of_inputs_from_previous_layer)
 				self.layers.append(hidden_layer)
 
 			# Construct last (output) layer of perceptrons
 			number_of_perceptrons_last_layer = len(self.target.unique())
-			number_of_perceptrons_previous_layer = self.hidden_layer_sizes[-1]
+			number_of_inputs_from_previous_layer = self.hidden_layer_sizes[-1]
 
-			output_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_perceptrons_previous_layer)
+			output_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_inputs_from_previous_layer)
 			self.layers.append(output_layer)
 
 		except Exception as e:
 			print(e)
 			# Construct last (output) layer of perceptrons
 			number_of_perceptrons_last_layer = len(self.target.unique())
-			number_of_perceptrons_previous_layer = len(self.data_inputs.columns)
-			output_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_perceptrons_previous_layer)
+			number_of_inputs_from_previous_layer = len(self.data_inputs.columns)
+			output_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_inputs_from_previous_layer)
 			self.layers.append(output_layer)
 
 		# Start feed forward and backward prop
