@@ -51,6 +51,10 @@ class Perceptron:
 		for i in range(len(self.weight)):
 			self.weight[i] += self.delta_weight[i]
 			self.delta_weight[i] = 0
+	
+	def load_weight(self, weights_from_file):
+		for i in range(len(weights_from_file)):
+			self.weight[i] = weights_from_file[i]
 
 class myMLP:
 
@@ -63,6 +67,9 @@ class myMLP:
 		self.error_treshold = error_treshold
 		self.batch_size = batch_size
 		self.output_print = []
+		# Model output file
+		self.output_file = []
+		self.is_loaded_from_file = False
 
 
 	def fit(self, data_inputs, target):
@@ -70,31 +77,31 @@ class myMLP:
 		self.target = target
 		self.classes = self.target.unique()
 
-		try:
-			#
-			number_of_inputs_from_previous_layer = len(self.data_inputs.columns)
-			# Initialize perceptrons in the hidden layers (from index 1)
-			for layer_idx in range(len(self.hidden_layer_sizes)):
-				# hidden_layer = Array of perceptrons
-				number_of_perceptrons_current_layer = self.hidden_layer_sizes[layer_idx]
-				hidden_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_current_layer, number_of_inputs_from_previous_layer)
-				number_of_inputs_from_previous_layer = self.hidden_layer_sizes[layer_idx]
-				self.layers.append(hidden_layer)
+		if (not self.is_loaded_from_file):
+			try:
+				number_of_inputs_from_previous_layer = len(self.data_inputs.columns)
+				# Initialize perceptrons in the hidden layers (from index 1)
+				for layer_idx in range(len(self.hidden_layer_sizes)):
+					# hidden_layer = Array of perceptrons
+					number_of_perceptrons_current_layer = self.hidden_layer_sizes[layer_idx]
+					hidden_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_current_layer, number_of_inputs_from_previous_layer)
+					number_of_inputs_from_previous_layer = self.hidden_layer_sizes[layer_idx]
+					self.layers.append(hidden_layer)
 
-			# Construct last (output) layer of perceptrons
-			number_of_perceptrons_last_layer = len(self.target.unique())
-			number_of_inputs_from_previous_layer = self.hidden_layer_sizes[-1]
+				# Construct last (output) layer of perceptrons
+				number_of_perceptrons_last_layer = len(self.target.unique())
+				number_of_inputs_from_previous_layer = self.hidden_layer_sizes[-1]
 
-			output_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_inputs_from_previous_layer)
-			self.layers.append(output_layer)
+				output_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_inputs_from_previous_layer)
+				self.layers.append(output_layer)
 
-		except Exception as e:
-			print(e)
-			# Construct last (output) layer of perceptrons
-			number_of_perceptrons_last_layer = len(self.target.unique())
-			number_of_inputs_from_previous_layer = len(self.data_inputs.columns)
-			output_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_inputs_from_previous_layer)
-			self.layers.append(output_layer)
+			except Exception as e:
+				print(e)
+				# Construct last (output) layer of perceptrons
+				number_of_perceptrons_last_layer = len(self.target.unique())
+				number_of_inputs_from_previous_layer = len(self.data_inputs.columns)
+				output_layer = self.initialize_perceptrons_in_layer(number_of_perceptrons_last_layer, number_of_inputs_from_previous_layer)
+				self.layers.append(output_layer)
 
 		# Start feed forward and backward prop
 		number_of_rows = len(data_inputs)
@@ -206,20 +213,69 @@ class myMLP:
 			predictions.append(self.classes[idx])
 		return predictions
 
-	def show_model(self, n=None):
+	def save_model(self):
 		self.output_print.clear()
+		self.output_file.clear()
 		for layer_idx in range(len(self.layers)):
 			for perceptron_idx in range(len(self.layers[layer_idx])):
 				for weight_idx in range(len(self.layers[layer_idx][perceptron_idx].weight)):
+					self.output_file.append(str(self.layers[layer_idx][perceptron_idx].weight[weight_idx]))
 					if (weight_idx != len(self.layers[layer_idx][perceptron_idx].weight) - 1):
 						self.output_print.append(str("Weight " + str(weight_idx) + "-" + "[" + str(layer_idx) + "][" + str(perceptron_idx) + "]: " + str(self.layers[layer_idx][perceptron_idx].weight[weight_idx])))
 					else:
 						self.output_print.append(str("Bias " + "[" + str(layer_idx) + "][" + str(perceptron_idx) + "]: " + str(self.layers[layer_idx][perceptron_idx].weight[weight_idx])))
-		
+				self.output_file.append("p")
+			# New layer
+			self.output_file.append("l")
+
+
+	def show_model(self, n=None):
+		self.save_model()
 		if (n is None):
 			for output in self.output_print:
 				print(output)
 		else:
 			for i in range(n):
 				print(self.output_print[i])
-				
+
+	def save_model_to_file(self, filename, n=None):
+		self.save_model()
+		f = open(filename, "w+")
+		for i in range(len(self.output_file)):
+			# New line every "l"
+			if (self.output_file[i] == "l"):
+				f.write("\n")
+			else:
+				f.write(self.output_file[i] + " ")
+		f.close()
+	
+	def load_perceptron_from_file(self, number_of_weights_include_bias, weights_from_file_per_perceptron):
+		perceptron = Perceptron(self.learning_rate, number_of_weights_include_bias)
+		perceptron.load_weight(weights_from_file_per_perceptron)
+		return perceptron
+
+	def load_model_from_file(self, filename, n=None):
+		f = open(filename, "r")
+		# If file is in open mode, then proceed
+		if (f.mode == 'r'):
+			self.layers.clear()
+			# Read per line
+			lines = f.readlines()
+			for line in lines:
+				# Split by " "
+				values = line.split()
+				weights_from_file_per_perceptron = []
+				one_layer_of_perceptrons = []
+				input_count = 0
+				for value in values:
+					if (value == 'p'):
+						perceptron = self.load_perceptron_from_file(input_count, weights_from_file_per_perceptron)
+						one_layer_of_perceptrons.append(perceptron)
+						input_count = 0
+						weights_from_file_per_perceptron.clear()
+					else:
+						weights_from_file_per_perceptron.append(float(value))
+						input_count = input_count + 1
+				self.layers.append(one_layer_of_perceptrons)
+		self.is_loaded_from_file = True
+		# self.show_model()
