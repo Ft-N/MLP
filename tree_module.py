@@ -86,7 +86,7 @@ class Tree:
         self.data = final_tree.data
         self.children = final_tree.children
         self.names = final_tree.names
-        self.export_tree()
+        # self.export_tree()
         
     def construct_tree_from_file_data(self, idx_line_indexes_dict=0, idx_indexes_array=0):
         idx_attr_name = self.line_indexes_dict[idx_line_indexes_dict][idx_indexes_array]
@@ -112,6 +112,24 @@ class Tree:
                     tree = self.construct_tree_from_file_data(idx_line_indexes_dict + 3, j)
                     tree_children.append(tree)
             return Tree(attr_name_from_file, tree_names, tree_children)
+
+    def classify(self, instance_dict, isFloat):
+        # If no children (must be leaf)
+        if (len(self.children) == 0):
+            return self.data
+
+        instance_class = None
+        if (self.data in instance_dict):
+            # Get every values of attribute name, then compare it with instance_dict values.
+            for idx_name in range(len(self.names)):
+                if (isFloat):
+                    name = float(self.names[idx_name])
+                else:
+                    name = self.names[idx_name]
+                if (name == instance_dict[self.data]):
+                    child_tree = self.children[idx_name]
+                    instance_class = child_tree.classify(instance_dict, isFloat)
+        return instance_class
 
     def getRules(self):
         if (len(self.children)<=0):
