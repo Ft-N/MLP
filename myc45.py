@@ -123,3 +123,26 @@ class myC45(myID3):
                         maxGain = gain
                         bestTempExamples = copy.copy(tempExamples)
         return bestTempExamples
+
+    def classify(self, tree, instance_dict):
+        # If no children (must be leaf)
+        if (len(tree.children) == 0):
+            return tree.data
+
+        instance_class = None
+        if (tree.data in instance_dict):
+            # Get every values of attribute name, then compare it with instance_dict values.
+            for idx_name in range(len(tree.names)):
+                attr = tree.names[idx_name]
+                if (attr.startswith("> ")):
+                    name = float(attr[2:])
+                    if (instance_dict[tree.data] > name):
+                        child_tree = tree.children[idx_name]
+                        instance_class = self.classify(child_tree, instance_dict)
+                elif (attr.startswith("<= ")):
+                    name = float(attr[3:])
+                    if (instance_dict[tree.data] <= name):
+                        child_tree = tree.children[idx_name]
+                        instance_class = self.classify(child_tree, instance_dict)
+                        
+        return instance_class

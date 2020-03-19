@@ -101,3 +101,22 @@ class myID3:
         copy = data
         copy = copy.reset_index(drop=True)
         return all(elem == copy[0] for elem in copy)
+
+
+    def classify(self, tree, instance_dict, isFloat):
+        # If no children (must be leaf)
+        if (len(tree.children) == 0):
+            return tree.data
+
+        instance_class = None
+        if (tree.data in instance_dict):
+            # Get every values of attribute name, then compare it with instance_dict values.
+            for idx_name in range(len(tree.names)):
+                if (isFloat):
+                    name = float(tree.names[idx_name])
+                else:
+                    name = tree.names[idx_name]
+                if (name == instance_dict[tree.data]):
+                    child_tree = tree.children[idx_name]
+                    instance_class = self.classify(child_tree, instance_dict, isFloat)
+        return instance_class

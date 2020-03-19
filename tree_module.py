@@ -113,23 +113,7 @@ class Tree:
                     tree_children.append(tree)
             return Tree(attr_name_from_file, tree_names, tree_children)
 
-    def classify(self, instance_dict, isFloat):
-        # If no children (must be leaf)
-        if (len(self.children) == 0):
-            return self.data
-
-        instance_class = None
-        if (self.data in instance_dict):
-            # Get every values of attribute name, then compare it with instance_dict values.
-            for idx_name in range(len(self.names)):
-                if (isFloat):
-                    name = float(self.names[idx_name])
-                else:
-                    name = self.names[idx_name]
-                if (name == instance_dict[self.data]):
-                    child_tree = self.children[idx_name]
-                    instance_class = child_tree.classify(instance_dict, isFloat)
-        return instance_class
+    
 
     def getRules(self):
         if (len(self.children)<=0):

@@ -17,25 +17,26 @@ df = pd.read_csv('iris.csv', sep=',')
 attributes = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
 target = 'species'
 
-# c45 = myC45(df, target, attributes)
+dict = {
+    "sepal_length": 5.5,
+    "sepal_width": 3.4,
+    "petal_length": 2.0,
+    "petal_width": 0.6
+}
+c45 = myC45(df, target, attributes)
 # c45.id3.tree_.export_tree()
 # c45.id3.tree_.save_to_file("SAVED-C45-Out")
-# c45.id3.tree_.load_from_file("SAVED-C45-Out")
+c45.id3.tree_.load_from_file("SAVED-C45-Out")
+print(c45.classify(c45.id3.tree_, dict))
 # c45.id3.tree_.save_to_file("SAVED-2-C45-Out")
 # if c45.prunedTree_ != []:
 # 	print("-------------------------AFTER PRUNING--------------------------")
 # 	c45.prunedTree_[0].export_tree()
 
-id3 = myID3(df, target, attributes)
-# id3.tree_.export_tree()
-id3.tree_.load_from_file("Output-ID3")
-dict = {
-    "sepal_length": 4.9,
-    "sepal_width": 3.0,
-    "petal_length": 4.2,
-    "petal_width": 5.0
-}
-print(id3.tree_.classify(dict, True))
+# id3 = myID3(df, target, attributes)
+# # id3.tree_.export_tree()
+# id3.tree_.load_from_file("Output-ID3")
+# print(id3.classify(id3.tree_, dict, True))
 # print(id3.tree_.data_from_file)
 # print(id3.tree_.line_indexes_dict)
 # id3.tree_.save_to_file("Output-ID3-Out")
