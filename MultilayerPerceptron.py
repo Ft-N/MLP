@@ -279,3 +279,4 @@ class myMLP:
 				self.layers.append(one_layer_of_perceptrons)
 		self.is_loaded_from_file = True
 		# self.show_model()
+		f.close()
