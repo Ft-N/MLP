@@ -5,11 +5,15 @@ from sklearn.model_selection import train_test_split
 
 # Confusion Matrix
 from sklearn.metrics import confusion_matrix 
-from sklearn.metrics import accuracy_score 
+from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report 
 
 # Kfold
 from sklearn.model_selection import KFold
+
+def experiment(mlp, filename):
+	mlp.save_model_to_file(filename)
+	mlp.load_model_from_file(filename)
 
 def split():
 	print("Split 90-10")
@@ -33,6 +37,7 @@ def split():
 	testY = testY.reset_index(drop=True)
 	mlp = myMLP()
 	mlp.fit(trainX, trainY)
+	experiment(mlp, "Output-MLP-Split-Test.txt")
 	prediction = mlp.predict(testX)
 	confusion_matrix_results = confusion_matrix(testY.values, prediction)
 
@@ -71,7 +76,7 @@ def kfold():
 	indices = kf.split(inputX)
 
 	mainmlp = myMLP()
-	maxacc = 0;
+	maxacc = 0
 
 	for train_index, test_index in indices: 
 		trainX, valX = inputX.iloc[train_index], inputX.iloc[test_index]
@@ -84,6 +89,7 @@ def kfold():
 
 		mlp = myMLP()
 		mlp.fit(trainX, trainY)
+		experiment(mlp, "Output-MLP-Kfold.txt")
 		prediction = mlp.predict(valX)
 		if (accuracy_score(valY.values, prediction) > maxacc):
 			mainmlp = mlp
