@@ -36,7 +36,7 @@ def split():
 
     #training
     df = pd.concat([inputs, target], axis=1)
-    train, test = train_test_split(df, test_size=0.3)
+    train, test = train_test_split(df, test_size=0.1)
     train = train.reset_index(drop=True)
 
     testX = test[['sepal_length','sepal_width','petal_length','petal_width']] # taking test data features

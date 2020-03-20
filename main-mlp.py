@@ -24,7 +24,7 @@ def split():
 
 	#training
 	df = pd.concat([inputs, target], axis=1)
-	train, test = train_test_split(df, test_size=0.3)
+	train, test = train_test_split(df, test_size=0.1)
 
 	trainX = train[['sepal_length','sepal_width','petal_length','petal_width']] # taking the training data features
 	trainY = train.species # output of our training data
