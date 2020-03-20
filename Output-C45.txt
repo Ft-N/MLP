@@ -3,19 +3,19 @@ petal_length
    class: Iris-setosa
  > 1.9
    sepal_length
-    > 5.5
+    <= 5.8
       sepal_width
-       <= 3.3
-         petal_width
-          > 0.6
-            class: Iris-virginica
-       > 3.3
-         petal_width
-          > 0.6
-            class: Iris-virginica
-    <= 5.5
-      sepal_width
-       <= 3.3
+       <= 3.0
          petal_width
           > 0.6
             class: Iris-versicolor
+    > 5.8
+      sepal_width
+       <= 3.0
+         petal_width
+          > 0.6
+            class: Iris-virginica
+       > 3.0
+         petal_width
+          > 0.6
+            class: Iris-virginica

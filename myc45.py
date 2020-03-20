@@ -10,44 +10,23 @@ pd.options.mode.chained_assignment = None
 
 class myC45(myID3):
 
-    def __init__(self, examples, target_attribute, attributes):
-        self.contDictionary = {}
+    def __init__(self, data, target_attribute, attributes):
         # Handle missing values first
-        handledExamples = self.handleMissingValues(examples)
+        train = self.handleMissingValues(data)
 
         continuous_attributes = []
         # Classify continuous and discrete values
         for attribute in attributes:
-            if (handledExamples[attribute].dtype == np.float64 or handledExamples[attribute].dtype == np.int64):
+            if (train[attribute].dtype == np.float64 or train[attribute].dtype == np.int64):
                 continuous_attributes.append(attribute)
         
-        bestTempExamples = self.splitAttributes(handledExamples, target_attribute, continuous_attributes)
-
-        x = bestTempExamples.drop(target_attribute,axis=1)
-        y = bestTempExamples[target_attribute]
-        x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2)
-        train = x_train
-        train[target_attribute] = y_train
-        test = x_test
-        test[target_attribute] = y_test
-        train = train.reset_index(drop=True)
+        train = self.splitAttributes(train, target_attribute, continuous_attributes)
 
         self.id3 = myID3(train, target_attribute, attributes)
-        
-        #prune tree
-        self.prunedTree_ = self.multiprune(self.id3.tree_, test, target_attribute, attributes)
 
-    #separate the trained data and the test data
-    def separateTrainedData(self, examples, target):
-        x = examples.drop(target,axis=1)
-        y = examples[target]
-        x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2)
-        train = x_train
-        train[target] = y_train
-        test = x_test
-        test[target] = y_test
-        train = train.reset_index(drop=True)
-    
+        #prune tree
+        # self.prunedTree_ = self.multiprune(self.id3.tree_, test, target_attribute, attributes)
+
     # accuracy of data
     def accuracy(self, tree, test, target_attribute, attributes):
         rules = tree.getRules()
