@@ -58,7 +58,7 @@ class Perceptron:
 
 class myMLP:
 
-	def __init__(self, hidden_layer_sizes=[2, 3], learning_rate=0.001, max_iter=200, error_treshold=0.0001, batch_size=32):
+	def __init__(self, hidden_layer_sizes=[10, 5, 2], learning_rate=0.05, max_iter=400, error_treshold=0.0001, batch_size=32):
 		# Attributes
 		self.layers = []
 		self.hidden_layer_sizes = hidden_layer_sizes
