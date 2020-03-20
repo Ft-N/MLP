@@ -1,42 +1,49 @@
-# examples are training examples
-# target_attribute is the attribute whose value is to be predicted by the tree
-# attributes is a list of other attributes that may be tested by the learned decision tree
-
 import pandas as pd
-from sklearn.model_selection import train_test_split
-import numpy as np
-
-from tree_module import *
-from myid3 import *
 from myc45 import *
-import math
-import copy
 
 pd.options.mode.chained_assignment = None
+
+def classify_id3(id3):
+    dict = {
+        "sepal_length": 5.5,
+        "sepal_width": 3.4,
+        "petal_length": 1.4,
+        "petal_width": 0.6
+    }
+    isFloat = True
+    print(id3.classify(id3.tree_, dict, isFloat))
+
+def classify_c45(c45):
+    dict = {
+        "sepal_length": 5.5,
+        "sepal_width": 3.3,
+        "petal_length": 2.0,
+        "petal_width": 0.65
+    }
+    print(c45.classify(c45.id3.tree_, dict))
+
+def start_id3_experiment(id3):
+    id3.tree_.save_to_file("Output-ID3.txt")
+    id3.tree_.load_from_file("Output-ID3.txt")
+    classify_id3(id3)
+
+def start_c45_experiment(c45):
+    c45.id3.tree_.save_to_file("Output-C45.txt")
+    c45.id3.tree_.load_from_file("Output-C45.txt")
+    classify_c45(c45)
+
+def main_c45():
+    c45 = myC45(df, target, attributes)
+    start_c45_experiment(c45)
+
+def main_id3():
+    id3 = myID3(df, target, attributes)
+    start_id3_experiment(id3)
+
 df = pd.read_csv('iris.csv', sep=',')
 attributes = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
 target = 'species'
 
-dict = {
-    "sepal_length": 5.5,
-    "sepal_width": 3.4,
-    "petal_length": 2.0,
-    "petal_width": 0.6
-}
-c45 = myC45(df, target, attributes)
-# c45.id3.tree_.export_tree()
-# c45.id3.tree_.save_to_file("SAVED-C45-Out")
-c45.id3.tree_.load_from_file("SAVED-C45-Out")
-print(c45.classify(c45.id3.tree_, dict))
-# c45.id3.tree_.save_to_file("SAVED-2-C45-Out")
-# if c45.prunedTree_ != []:
-# 	print("-------------------------AFTER PRUNING--------------------------")
-# 	c45.prunedTree_[0].export_tree()
-
-# id3 = myID3(df, target, attributes)
-# # id3.tree_.export_tree()
-# id3.tree_.load_from_file("Output-ID3")
-# print(id3.classify(id3.tree_, dict, True))
-# print(id3.tree_.data_from_file)
-# print(id3.tree_.line_indexes_dict)
-# id3.tree_.save_to_file("Output-ID3-Out")
+# Main Program Goes Here:
+# main_id3()
+main_c45()
